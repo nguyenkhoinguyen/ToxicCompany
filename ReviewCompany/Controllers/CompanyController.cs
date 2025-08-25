@@ -11,7 +11,7 @@ namespace ReviewCompany.Controllers
     public class CompanyController : ControllerBase
     {
         [HttpGet("GetCompany")]
-        public ActionResult<GetCompanyResponse> GetCompany([FromQuery] GetCompanyRequest request)
+        public async Task<ActionResult<GetCompanyResponse>> GetCompany([FromQuery] GetCompanyRequest request)
         {
             if (string.IsNullOrWhiteSpace(request.DeviceId))
                 return BadRequest("DeviceId is required.");
@@ -38,6 +38,39 @@ namespace ReviewCompany.Controllers
                 Success = true,
                 Total = list.Count,
                 Result = list
+            };
+        }
+
+        [HttpGet("GetCompany-detail")]
+        public async Task<ActionResult<GetCompanyDetailResponse>> GetCompanyDetail([FromQuery] GetCompanyDetailRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request.DeviceId))
+                return BadRequest("DeviceId is required.");
+
+            // DỮ LIỆU MẪU
+            var list = new List<CompanyDto>
+            {
+                new CompanyDto
+                {
+                    Id = 1, Name = "ABC Corp", CategoryName = "Tech", Size = 200,
+                    Adress = "Hà Nội", AverageStar = 4.3f, TotalReview = 128, Logo = "/img/abc.png"
+                },
+                new CompanyDto
+                {
+                    Id = 2, Name = "Sunrise", CategoryName = "Food", Size = 50,
+                    Adress = "Đà Nẵng", AverageStar = 4.8f, TotalReview = 64, Logo = "/img/sunrise.png"
+                }
+            };
+
+            var company = list.Where(m => m.Id == request.Id).FirstOrDefault();
+
+            // TODO: filter/sort/paging theo request (CompanyName/Category/Star/SortBy/Page/PageSize) nếu cần
+
+            return new GetCompanyDetailResponse
+            {
+                Success = true,
+                Total = 1,
+                Result = company
             };
         }
     }
